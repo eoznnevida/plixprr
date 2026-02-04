@@ -1,12 +1,11 @@
 // =====================
-// ENV / DEPENDÊNCIAS
+// DEPENDÊNCIAS
 // =====================
-require("dotenv").config();
 const express = require("express");
 const path = require("path");
 
 // =====================
-// UTILS (confere os nomes dos arquivos!)
+// UTILS
 // =====================
 const Console = require("./ConsoleUtils");
 const CryptoUtils = require("./CryptoUtils");
@@ -44,7 +43,7 @@ app.use(express.json());
 // =====================
 // CONFIG
 // =====================
-const TITLE = "StumblePlix " + (process.env.VERSION || "dev");
+const TITLE = "StumblePlix dev";
 const PORT = process.env.PORT || 3000;
 
 // =====================
@@ -180,11 +179,22 @@ app.get("/api/v1/tournaments", TournamentController.getActive);
 app.use(errorControll);
 
 // =====================
-// START
+// START (CORRETO)
 // =====================
-app.listen(PORT, () => {
-  const now = new Date().toLocaleString().replace(",", " |");
-  console.clear();
-  Console.log("Server", `[${TITLE}] | ${now} | ${CryptoUtils.SessionToken()}`);
-  Console.log("Server", `Listening on port ${PORT}`);
-});
+async function start() {
+  try {
+    await BackendUtils.connect();
+
+    app.listen(PORT, () => {
+      const now = new Date().toLocaleString().replace(",", " |");
+      console.clear();
+      Console.log("Server", `[${TITLE}] | ${now} | ${CryptoUtils.SessionToken()}`);
+      Console.log("Server", `Listening on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("Erro ao iniciar servidor:", err);
+    process.exit(1);
+  }
+}
+
+start();
